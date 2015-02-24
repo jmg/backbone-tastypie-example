@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div id="login" style="display: none">
+    <form id="login-form" class="form-signin">
+        <h2 class="form-signin-heading">Please Sign In</h2>
+
+        <label for="email" class="sr-only">Email address</label>
+        <input type="email" class="form-control email" placeholder="Email address" required="required">
+
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" class="form-control password" placeholder="Password" required="required">
+
+        <button id="loginButton" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+    <div class="create-account">
+        or <a id="create-account">create an account</a>
+    </div>
+</div>
+
+<div id="registration" style="display: none">
+    <form id="registration-form" class="form-registration" autocomplete="off">
+        <h2 class="form-signin-heading">Create An Account</h2>
+
+        <label for="email" class="sr-only">Email address</label>
+        <input type="email" class="form-control email" placeholder="Email address" required="required">
+
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" class="form-control password" placeholder="Password" required="required">
+
+        <label for="password_again" class="sr-only">Password Again</label>
+        <input type="password" name="password_again" class="form-control password_again" placeholder="Password Again" required="required">
+
+        <button id="loginButton" class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+    </form>
+    <div class="show-login">
+        or <a id="show-login">sign in</a>
+    </div>
+</div>
+
+<div id="meals" style="display: none">
+    <h3 class="center">My meals</h3>
+    <table class="table table-striped">
+        <tr><th>Text</th><th>Calories</th><th>Date Time</th><th></th></tr>
+    </table>
+</div>
+
+<div id="create-meal" style="display: none">
+    <h3 class="center">Enter a new meal</h3>
+    <form class="form-signin">
+        <label>Text</label>
+        <input type="text" name="text" class="form-control" placeholder="" required="" autofocus="">
+
+        <label>Date</label>
+        <input type="date" name="date" class="form-control" placeholder="" required="" autofocus="">
+
+        <label>Time</label>
+        <input type="time" name="time" class="form-control" placeholder="" required="" autofocus="">
+
+        <label>Calories</label>
+        <input type="number" name="calories" class="form-control" placeholder="" required="" autofocus="">
+
+        <br>
+        <input type="submit" class="btn btn-primary btn-lg btn-block" placeholder="" value="Save">
+    </form>
+</div>
+
+<div id="menu" style="display: none">
+    <button id="logout" class="btn">Logout</button>
+    <button id="settings" class="btn">Settings</button>
+</div>
+
+<div id="user-settings" style="display: none">
+    <h3 class="center">Enter your expected calories per day</h3>
+    <input type="number" name="calories" class="form-control calories">
+    <br>
+    <input type="submit" class="btn btn-primary btn-lg btn-block" placeholder="" value="Save">
+</div>
+{% endblock %}

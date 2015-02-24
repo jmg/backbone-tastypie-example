@@ -1,0 +1,40 @@
+{% load staticfiles %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Meals</title>
+
+    <link href="{% static 'css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+    <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/underscore.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/backbone.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/backbone-tastypie.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+
+    <script type="text/javascript">
+        {% if user.is_authenticated %}
+            window.currentUser = new Customer({
+                "username": "{{user.username}}",
+                "id": "{{user.get_profile.id}}"
+            });
+        {% else %}
+            window.currentUser = false;
+        {% endif %}
+    </script>
+
+  </head>
+
+
+<body>
+
+<div class="container">
+    <h1 class="center app-title">Calories Control App</h1>
+    {% block body %}{% endblock %}
+</div>
+
+</body>
+</html>
