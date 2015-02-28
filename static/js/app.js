@@ -69,7 +69,7 @@ var MenuView = Backbone.View.extend({
     },
 
     settings: function() {
-
+        $("#user-settings-modal").modal();
     }
 });
 

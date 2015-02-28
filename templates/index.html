@@ -49,7 +49,7 @@
 
 <div id="meals" style="display: none">
     <table class="table table-striped">
-        <tr><th>Text</th><th>Calories</th><th>Date Time</th><th></th></tr>
+        <tr><th>Title</th><th>Calories</th><th>Date Time</th><th></th></tr>
     </table>
 </div>
 
@@ -92,10 +92,29 @@
 
 </div>
 
-<div id="user-settings" style="display: none">
-    <h3 class="center">Enter your expected calories per day</h3>
-    <input type="number" name="calories" class="form-control calories">
-    <br>
-    <input type="submit" class="btn btn-primary btn-lg btn-block" placeholder="" value="Save">
+<div id="user-settings-modal" class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+            <h4 class="modal-title" id="myModalLabel">Settings</h4>
+        </div>
+
+        <form class="new-meal-form">
+        <div class="modal-body">
+
+            <label>Enter the expected calories per day</label>
+            <input type="text" name="text" class="form-control" placeholder="" required="">
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-primary" value="Save">
+        </div>
+        </form>
+    </div>
+</div>
 </div>
 {% endblock %}
