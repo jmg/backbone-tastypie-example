@@ -13,7 +13,6 @@ a {
 }
 .container {
     max-width: 920px;
-    padding: 15px;
     margin: 0 auto;
 }
 .form-signin, .form-registration {
@@ -64,4 +63,12 @@ a {
 }
 .right {
     text-align: right;
+}
+.clear {
+    clear: both;
+    margin-bottom: 15px;
+}
+.new-meal-form {
+    margin: 0;
+    padding: 0;
 }

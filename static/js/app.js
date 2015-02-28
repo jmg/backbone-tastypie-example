@@ -52,7 +52,9 @@ var LoginView = Backbone.View.extend({
 var MenuView = Backbone.View.extend({
 
     events: {
-        "click #logout": "logout"
+        "click #logout": "logout",
+        "click #settings": "settings",
+        "click #create-new-meal": "newMeal"
     },
 
     logout: function() {
@@ -61,6 +63,14 @@ var MenuView = Backbone.View.extend({
             this.currentUser = false;
         });
     },
+
+    newMeal: function() {
+        $("#new-meal-modal").modal();
+    },
+
+    settings: function() {
+
+    }
 });
 
 var RegistrationView = Backbone.View.extend({
@@ -108,7 +118,9 @@ var MealCreateView = Backbone.View.extend({
         var data = {}
         this.$el.find('input').each(function() {
             data[this.name] = this.value;
-            this.value = "";
+            if (this.value != "Save") {
+                this.value = "";
+            }
         });
 
         model.set("text", data.text);
@@ -117,6 +129,9 @@ var MealCreateView = Backbone.View.extend({
         model.set("customer", app.currentUser.getApiUri());
 
         model.save();
+        meals.add(model);
+
+        $("#new-meal-modal").modal("hide");
     }
 });
 
@@ -131,7 +146,7 @@ var MealItemView = Backbone.View.extend({
     events : {
     },
 
-    template : _.template("<td>Text: <%- text %></td><td>Calories: <%- calories %></td><td>Date: <%- date_time %></td><td class='right'><span class='glyphicon glyphicon-edit' aria-hidden='true'></span> <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> </td>"),
+    template : _.template("<td><%- text %></td><td><%- calories %></td><td><%- date_time %></td><td class='right'><span class='glyphicon glyphicon-edit' aria-hidden='true'></span> <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> </td>"),
 
     render : function() {
         this.$el.html(this.template(this.model.toJSON()));
@@ -139,14 +154,16 @@ var MealItemView = Backbone.View.extend({
     }
 });
 
+var meals = new Meals();
+
 var MealsListView = Backbone.View.extend({
 
-    collection: new Meals(),
+    collection: meals,
 
     initialize: function(){
 
-        this.collection.bind('add', this.addOne, this);
         this.collection.bind('reset', this.addAll, this);
+        this.listenTo(this.collection, 'add', this.addOne);
 
         this.views = [];
 

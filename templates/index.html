@@ -38,36 +38,58 @@
     </div>
 </div>
 
+<div id="menu" style="display: none;" >
+    <button id="create-new-meal" class="btn btn-primary">Enter new meal</button>
+    <div class="pull-right">
+        <button id="settings" class="btn">Settings</button>
+        <button id="logout" class="btn">Logout</button>
+    </div>
+    <div class="clear"></div>
+</div>
+
 <div id="meals" style="display: none">
-    <h3 class="center">My meals</h3>
     <table class="table table-striped">
         <tr><th>Text</th><th>Calories</th><th>Date Time</th><th></th></tr>
     </table>
 </div>
 
 <div id="create-meal" style="display: none">
-    <h3 class="center">Enter a new meal</h3>
-    <form class="form-signin">
-        <label>Text</label>
-        <input type="text" name="text" class="form-control" placeholder="" required="" autofocus="">
 
-        <label>Date</label>
-        <input type="date" name="date" class="form-control" placeholder="" required="" autofocus="">
+<div id="new-meal-modal" class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="myModalLabel">Enter a new meal</h4>
+            </div>
 
-        <label>Time</label>
-        <input type="time" name="time" class="form-control" placeholder="" required="" autofocus="">
+            <form class="new-meal-form">
+            <div class="modal-body">
 
-        <label>Calories</label>
-        <input type="number" name="calories" class="form-control" placeholder="" required="" autofocus="">
+                <label>Title</label>
+                <input type="text" name="text" class="form-control" placeholder="" required="">
 
-        <br>
-        <input type="submit" class="btn btn-primary btn-lg btn-block" placeholder="" value="Save">
-    </form>
+                <label>Date</label>
+                <input type="date" name="date" class="form-control" placeholder="" required="">
+
+                <label>Time</label>
+                <input type="time" name="time" class="form-control" placeholder="" required="">
+
+                <label>Calories</label>
+                <input type="number" name="calories" class="form-control" placeholder="" required="">
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" value="Save">
+            </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<div id="menu" style="display: none">
-    <button id="logout" class="btn">Logout</button>
-    <button id="settings" class="btn">Settings</button>
 </div>
 
 <div id="user-settings" style="display: none">
