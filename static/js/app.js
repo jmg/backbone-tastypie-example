@@ -139,14 +139,21 @@ var MealItemView = Backbone.View.extend({
 
     tagName : 'tr',
 
-    initialize : function(model, options){
-        this.options = options
-    },
-
     events : {
+        "click .glyphicon-remove": "removeMeal"
     },
 
     template : _.template("<td><%- text %></td><td><%- calories %></td><td><%- date_time %></td><td class='right'><span class='glyphicon glyphicon-edit' aria-hidden='true'></span> <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> </td>"),
+
+    initialize : function(model) {
+
+        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'destroy', this.remove);
+    },
+
+    removeMeal: function() {
+        this.model.destroy();
+    },
 
     render : function() {
         this.$el.html(this.template(this.model.toJSON()));
@@ -160,9 +167,13 @@ var MealsListView = Backbone.View.extend({
 
     collection: meals,
 
+    events: {
+
+    },
+
     initialize: function(){
 
-        this.collection.bind('reset', this.addAll, this);
+        this.listenTo(this.collection, 'reset', this.addAll, this);
         this.listenTo(this.collection, 'add', this.addOne);
 
         this.views = [];
