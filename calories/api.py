@@ -30,6 +30,8 @@ class CustomerResource(BaseApiResource):
     class Meta:
         queryset = Customer.objects.all()
         resource_name = "customer"
+        authorization = Authorization()
+        always_return_data = True
         #authentication = SessionAuthentication()
 
     def prepend_urls(self):
@@ -76,9 +78,16 @@ class MealResource(BaseApiResource):
         queryset = Meal.objects.all()
         resource_name = "meal"
         authorization = Authorization()
+        always_return_data = True
         #authentication = SessionAuthentication()
 
-    filtering = {
-        'customer': ALL_WITH_RELATIONS,
-        'date_time': ['exact', 'lt', 'lte', 'gte', 'gt']
-    }
+        filtering = {
+            'customer': ALL_WITH_RELATIONS,
+            'date': ['exact', 'lt', 'lte', 'gte', 'gt'],
+            'time': ['exact', 'lt', 'lte', 'gte', 'gt'],
+        }
+
+    def dehydrate(self, bundle):
+        bundle.data['date'] = bundle.data['date'].strftime("%m-%d-%Y")
+        bundle.data['time'] = bundle.data['time'].strftime("%I:%M %p")
+        return bundle

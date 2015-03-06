@@ -11,6 +11,7 @@
 
     <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootbox.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/underscore.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/backbone.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/backbone-tastypie.js' %}"></script>
@@ -18,10 +19,11 @@
 
     <script type="text/javascript">
         {% if user.is_authenticated %}
-            window.currentUser = new Customer({
+            window.currentUser = {
                 "username": "{{user.username}}",
-                "id": "{{user.get_profile.id}}"
-            });
+                "id": "{{user.get_profile.id}}",
+                "max_calories": "{{user.get_profile.max_calories}}"
+            };
         {% else %}
             window.currentUser = false;
         {% endif %}

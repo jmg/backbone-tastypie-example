@@ -10,7 +10,8 @@ class Customer(models.Model):
 
 class Meal(models.Model):
 
-    date_time = models.DateTimeField()
+    date = models.DateTimeField()
+    time = models.TimeField()
     text = models.TextField(null=True, blank=True)
     calories = models.DecimalField(max_digits=10, decimal_places=2)
     customer = models.ForeignKey(Customer)

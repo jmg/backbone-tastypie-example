@@ -1,16 +1,20 @@
-var API_URL = "/api/v1/"
+$(document).ready(function() {
+
+var API_URL = "/api/v1/";
 
 var Customer = Backbone.Model.extend({
 
     urlRoot: API_URL + 'customer/',
+    idAttribute: "id",
 
     getApiUri: function() {
-        return API_URL + "customer/" + this.get("id") + "/";
+        return this.urlRoot + this.get("id") + "/";
     }
 });
 
 var Meal = Backbone.Model.extend({
 
+    idAttribute: "id",
     urlRoot: API_URL + 'meal/'
 });
 
@@ -38,7 +42,7 @@ var LoginView = Backbone.View.extend({
                 app.showMealsPanel();
                 app.currentUser = new Customer({id: response.id, username: email});
             } else {
-                alert("Error")
+                bootbox.alert("Incorrect user or password");
             }
         });
     },
@@ -64,13 +68,24 @@ var MenuView = Backbone.View.extend({
         });
     },
 
+    cleanModal: function(mealModal) {
+        mealModal.find('form input').each(function() {
+            if (this.value != "Save") {
+                this.value = "";
+            }
+        });
+    },
+
     newMeal: function() {
-        $("#new-meal-modal").modal();
+        var mealModal = $("#new-meal-modal");
+        mealModal.find(".modal-title").text("Enter a new meal");
+        this.cleanModal(mealModal);
+        mealModal.modal();
     },
 
     settings: function() {
         $("#user-settings-modal").modal();
-    }
+    },
 });
 
 var RegistrationView = Backbone.View.extend({
@@ -92,7 +107,7 @@ var RegistrationView = Backbone.View.extend({
                 app.showMealsPanel();
                 app.currentUser = new Customer({id: response.id, username: email});
             } else {
-                alert("Error")
+                bootbox.alert("Passwords don't match");
             }
         });
     },
@@ -113,9 +128,8 @@ var MealCreateView = Backbone.View.extend({
     createMeal: function(event) {
 
         event.preventDefault();
-        var model = new this.model;
 
-        var data = {}
+        var data = {};
         this.$el.find('input').each(function() {
             data[this.name] = this.value;
             if (this.value != "Save") {
@@ -123,15 +137,45 @@ var MealCreateView = Backbone.View.extend({
             }
         });
 
+        if (!!data.id) {
+            var model = app.meals.get(data.id);
+        } else {
+            var model = new this.model;
+        }
         model.set("text", data.text);
         model.set("calories", data.calories);
-        model.set("date_time", data.date + " " + data.time);
+        model.set("date", data.date);
+        model.set("time", data.time);
         model.set("customer", app.currentUser.getApiUri());
 
         model.save();
-        meals.add(model);
+        if (model.isNew()) {
+            app.meals.add(model);
+        }
 
         $("#new-meal-modal").modal("hide");
+    }
+});
+
+var UserSettingsView = Backbone.View.extend({
+
+    events: {
+        'submit form': 'updateSettings'
+    },
+
+    updateSettings: function(event) {
+
+        event.preventDefault();
+
+        var data = {}
+        this.$el.find('input').each(function() {
+            data[this.name] = this.value;
+        });
+
+        app.currentUser.set("max_calories", data.max_calories);
+        app.currentUser.save();
+
+        $("#user-settings-modal").modal("hide");
     }
 });
 
@@ -140,66 +184,140 @@ var MealItemView = Backbone.View.extend({
     tagName : 'tr',
 
     events : {
-        "click .glyphicon-remove": "removeMeal"
+        "click .glyphicon-remove": "removeMeal",
+        "click .glyphicon-edit": "editMeal"
     },
 
-    template : _.template("<td><%- text %></td><td><%- calories %></td><td><%- date_time %></td><td class='right'><span class='glyphicon glyphicon-edit' aria-hidden='true'></span> <span class='glyphicon glyphicon-remove' aria-hidden='true'></span> </td>"),
+    template : _.template($("#meal-row-template").html()),
 
-    initialize : function(model) {
+    initialize: function(model) {
 
         this.listenTo(this.model, 'change', this.render);
         this.listenTo(this.model, 'destroy', this.remove);
     },
 
     removeMeal: function() {
-        this.model.destroy();
+
+        var model = this.model;
+        bootbox.confirm({
+            message: "Are you sure you want to delete this meal?",
+            callback: function(result) {
+                if (result === true) {
+                    model.destroy();
+                }
+            }
+        });
     },
 
-    render : function() {
+    editMeal: function() {
+
+        var mealModal = $("#new-meal-modal");
+        mealModal.find(".modal-title").text("Edit Meal");
+
+        mealModal.find('input[name=text]').val(this.model.get("text"));
+        mealModal.find('input[name=calories]').val(this.model.get("calories"));
+        mealModal.find('input[name=id]').val(this.model.get("id"));
+
+        var date = new Date(this.model.get("date"));
+        var time = new Date(this.model.get("date") + " " + this.model.get("time"));
+        mealModal.find('input[name=date]').val(this.getDate(date));
+        mealModal.find('input[name=time]').val(this.getTime(time));
+
+        mealModal.modal();
+    },
+
+    formatTime: function(time) {
+        var formattedTime = (time < 10) ? "0" : "";
+        return formattedTime + time;
+    },
+
+    getDate: function(date) {
+        return date.getFullYear() + "-" + this.formatTime((date.getMonth()+1)) + "-" + this.formatTime(date.getDate());
+    },
+
+    getTime: function(date) {
+        var hours = date.getHours();
+        var mins = date.getMinutes();
+        var secs = date.getSeconds();
+        return this.formatTime(hours) + ":" + this.formatTime(mins) + ":" + this.formatTime(secs);
+    },
+
+    render: function() {
         this.$el.html(this.template(this.model.toJSON()));
         return this;
     }
 });
 
-var meals = new Meals();
-
 var MealsListView = Backbone.View.extend({
 
-    collection: meals,
-
     events: {
-
+        "submit #search-form": "searchMeals"
     },
 
     initialize: function(){
 
         this.listenTo(this.collection, 'reset', this.addAll, this);
-        this.listenTo(this.collection, 'add', this.addOne);
-
-        this.views = [];
+        this.listenTo(this.collection, 'add', this.addOne, this);
+        this.listenTo(this.collection, 'all', this.render, this);
 
         this.collection.fetch();
     },
 
     addAll: function() {
-        this.views = [];
         this.collection.each(this.addOne);
     },
 
     addOne: function(meal) {
 
-        var view = new MealItemView({
-            model: meal
-        });
-        this.$("table").append(view.render().el);
-        this.views.push(view);
+        var view = new MealItemView({model: meal});
+        this.$("table tbody").append(view.render().el);
     },
 
     render: function() {
-        this.collection.each(this.addOne, this);
         return this;
-    }
+    },
 
+    reset: function() {
+        this.$("table tbody").html("");
+    },
+
+    searchMeals: function(event) {
+        event.preventDefault();
+
+        var form = $("#search-form");
+
+        var dateParams = ["date_from", "date_to", "time_from", "time_to"];
+        var filters = {};
+        var apiFilters = {};
+
+        for (var i=0; i < dateParams.length; i++) {
+            var value = form.find("input[name=" + dateParams[i] + "]").val();
+            if (value) {
+                filters[dateParams[i]] = value;
+            }
+        }
+
+        if (filters.date_from) {
+            apiFilters.date__gte = filters.date_from;
+        }
+        if (filters.date_to) {
+            apiFilters.date__lte = filters.date_to;
+        }
+        if (filters.time_from) {
+            apiFilters.time__gte = filters.time_from;
+        }
+        if (filters.time_to) {
+            apiFilters.time__lte = filters.time_to;
+        }
+
+        console.log(apiFilters);
+
+        this.reset();
+        this.collection.reset();
+
+        this.collection.fetch({ data: apiFilters });
+
+    }
 });
 
 var MealsApp = Backbone.Router.extend({
@@ -212,14 +330,17 @@ var MealsApp = Backbone.Router.extend({
 
     initialize: function() {
 
+        this.meals = new Meals();
+
         this.views.loginView = new LoginView({el: $("#login")});
-        this.views.menuView = new MenuView({el: $("#menu")});
-        this.views.mealListView = new MealsListView({el: $("#meals")});
-        this.views.mealCreateView = new MealCreateView({el: $("#create-meal")});
         this.views.registrationView = new RegistrationView({el: $("#registration")});
+        this.views.menuView = new MenuView({el: $("#menu")});
+        this.views.mealListView = new MealsListView({el: $("#meals"), collection: this.meals});
+        this.views.mealCreateView = new MealCreateView({el: $("#create-meal")});
+        this.views.userSettingsView = new UserSettingsView({el: $("#user-settings")});
 
         if (window.currentUser) {
-            this.currentUser = window.currentUser;
+            this.currentUser = new Customer(window.currentUser);
         } else {
             this.currentUser = false;
         }
@@ -254,7 +375,6 @@ var MealsApp = Backbone.Router.extend({
     }
 })
 
-$(document).ready(function() {
+window.app = new MealsApp();
 
-    window.app = new MealsApp();
 });

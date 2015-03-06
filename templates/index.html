@@ -39,82 +39,114 @@
 </div>
 
 <div id="menu" style="display: none;" >
-    <button id="create-new-meal" class="btn btn-primary">Enter new meal</button>
-    <div class="pull-right">
-        <button id="settings" class="btn">Settings</button>
-        <button id="logout" class="btn">Logout</button>
+    <div class="menu">
+        <button id="create-new-meal" class="btn btn-primary">Enter new meal <span class='glyphicon glyphicon-plus-sign' aria-hidden='true'></button>
+
+        <div class="pull-right">
+            <button id="settings" class="btn">Settings <span class='glyphicon glyphicon-user' aria-hidden='true'></button>
+            <button id="logout" class="btn">Logout <span class='glyphicon glyphicon-log-out' aria-hidden='true'></button>
+        </div>
+        <div class="clear"></div>
     </div>
-    <div class="clear"></div>
 </div>
 
 <div id="meals" style="display: none">
+    <form id="search-form" class="form-inline search-form">
+        <label>Date From</label>
+        <input type="date" name="date_from" class="form-control">
+        <label>To</label>
+        <input type="date" name="date_to" class="form-control">
+
+        <label>Time From</label>
+        <input type="time" name="time_from" class="form-control">
+        <label>To</label>
+        <input type="time" name="time_to" class="form-control">
+
+        <button class="search-btn btn btn-primary">Search <span class='glyphicon glyphicon-search' aria-hidden='true'></span></button>
+    </form>
+
     <table class="table table-striped">
-        <tr><th>Title</th><th>Calories</th><th>Date Time</th><th></th></tr>
+        <thead>
+        <tr><th>Title</th><th>Calories</th><th>Date</th><th>Time</th><th></th></tr>
+        </thead>
+        <tbody>
+        </tbody>
     </table>
 </div>
 
-<div id="create-meal" style="display: none">
+<script type="text/template" id="meal-row-template">
+    <td><%- text %></td>
+    <td><%- calories %></td>
+    <td><%- date %></td>
+    <td><%- time %></td>
+    <td class='right'>
+        <span class='glyphicon glyphicon-edit' aria-hidden='true'></span>
+        <span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
+    </td>
+</script>
 
-<div id="new-meal-modal" class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+<div id="create-meal">
+    <div id="new-meal-modal" class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title" id="myModalLabel">Enter a new meal</h4>
+                </div>
+
+                <form class="new-meal-form">
+                <div class="modal-body">
+                    <input type="hidden" name="id">
+
+                    <label>Title</label>
+                    <input type="text" name="text" class="form-control" placeholder="" required="">
+
+                    <label>Date</label>
+                    <input type="date" name="date" class="form-control" placeholder="" required="">
+
+                    <label>Time</label>
+                    <input type="time" name="time" class="form-control" placeholder="" required="">
+
+                    <label>Calories</label>
+                    <input type="number" name="calories" class="form-control" placeholder="" required="">
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" value="Save">
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="user-settings">
+    <div id="user-settings-modal" class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title" id="myModalLabel">Enter a new meal</h4>
+                <h4 class="modal-title" id="myModalLabel">Settings</h4>
             </div>
 
             <form class="new-meal-form">
             <div class="modal-body">
+                <label>Enter your expected calories per day</label>
+                <input type="number" name="max_calories" class="form-control" placeholder="" required="" value="{{user.get_profile.max_calories}}">
 
-                <label>Title</label>
-                <input type="text" name="text" class="form-control" placeholder="" required="">
-
-                <label>Date</label>
+                <label>Enter the date you want to check</label>
                 <input type="date" name="date" class="form-control" placeholder="" required="">
-
-                <label>Time</label>
-                <input type="time" name="time" class="form-control" placeholder="" required="">
-
-                <label>Calories</label>
-                <input type="number" name="calories" class="form-control" placeholder="" required="">
-
             </div>
 
             <div class="modal-footer">
-
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 <input type="submit" class="btn btn-primary" value="Save">
             </div>
             </form>
         </div>
     </div>
-</div>
-
-</div>
-
-<div id="user-settings-modal" class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
-<div class="modal-dialog">
-    <div class="modal-content">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-            <h4 class="modal-title" id="myModalLabel">Settings</h4>
-        </div>
-
-        <form class="new-meal-form">
-        <div class="modal-body">
-
-            <label>Enter the expected calories per day</label>
-            <input type="text" name="text" class="form-control" placeholder="" required="">
-
-        </div>
-
-        <div class="modal-footer">
-
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <input type="submit" class="btn btn-primary" value="Save">
-        </div>
-        </form>
     </div>
-</div>
 </div>
 {% endblock %}

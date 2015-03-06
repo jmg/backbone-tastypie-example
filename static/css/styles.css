@@ -7,7 +7,7 @@ a {
     cursor: pointer;
 }
 .app-title {
-    color: blue;
+    color: #337ab7;
     font-family: "Trebuchet MS", Helvetica, sans-serif;
     font-weight: bold;
 }
@@ -23,6 +23,7 @@ a {
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
     margin-bottom: 10px;
+    margin-top: 40px;
 }
 .form-registration input {
     margin-bottom: 10px;
@@ -52,8 +53,36 @@ a {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+.menu {
+    margin-top: 50px;
+}
 .form-control {
     height: 44px !important;
+}
+.search-form {
+    display: inline-block;
+    margin-top: 10px;
+}
+.search-form input {
+    height: 35px !important;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.search-form input[type=date] {
+    width: 153px !important;
+}
+.search-form input[type=time] {
+    width: 120px !important;
+}
+.search-form label {
+    position: relative;
+    top: 3px;
+}
+.search-btn {
+    width: 95px;
+}
+.glyphicon {
+    margin-left: 5px;
 }
 .create-account, .show-login, .center {
     text-align: center;
@@ -66,9 +95,15 @@ a {
 }
 .clear {
     clear: both;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 .new-meal-form {
     margin: 0;
     padding: 0;
+}
+form input.form-control {
+    margin-bottom: 10px;
+}
+.search-form input {
+    margin-bottom: 0 !important;
 }
