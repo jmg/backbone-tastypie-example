@@ -107,3 +107,22 @@ form input.form-control {
 .search-form input {
     margin-bottom: 0 !important;
 }
+.bar {
+    height: 30px;
+    width: 70px;
+}
+.metric-success p, .metric-failure p {
+    display: inline-block;
+    margin-left: 10px;
+    position: relative;
+    top: -10px;
+}
+.bar {
+    display: inline-block;
+}
+.metric-success .bar {
+    background-color: green;
+}
+.metric-failure .bar {
+    background-color: red;
+}

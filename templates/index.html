@@ -138,11 +138,21 @@
 
                 <label>Enter the date you want to check</label>
                 <input type="date" name="date" class="form-control" placeholder="" required="">
+
+                <div id="calories-results" style="display: none">
+                    <label>Results: <span id="calories-total"></span> calories</label>
+                    <div class="metric-success" style="display: none">
+                        <div class="bar"></div><p>Congratulations. Your are doing good!</p>
+                    </div>
+                    <div class="metric-failure" style="display: none">
+                        <div class="bar"></div><p>Your calories are over the expected value!</p>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <input type="submit" class="btn btn-primary" value="Save">
+                <input type="submit" class="btn btn-primary" value="Check">
             </div>
             </form>
         </div>

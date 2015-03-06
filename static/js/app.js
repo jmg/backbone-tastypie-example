@@ -24,6 +24,24 @@ var Meals = Backbone.Collection.extend({
     model: Meal
 });
 
+var Utils = {
+    formatTime: function(time) {
+        var formattedTime = (time < 10) ? "0" : "";
+        return formattedTime + time;
+    },
+
+    getDate: function(date) {
+        return date.getUTCFullYear() + "-" + this.formatTime((date.getUTCMonth()+1)) + "-" + this.formatTime(date.getUTCDate());
+    },
+
+    getTime: function(date) {
+        var hours = date.getUTCHours();
+        var mins = date.getUTCMinutes();
+        var secs = date.getUTCSeconds();
+        return this.formatTime(hours) + ":" + this.formatTime(mins) + ":" + this.formatTime(secs);
+    }
+}
+
 var LoginView = Backbone.View.extend({
 
     events: {
@@ -84,7 +102,9 @@ var MenuView = Backbone.View.extend({
     },
 
     settings: function() {
-        $("#user-settings-modal").modal();
+        var modal = $("#user-settings-modal");
+        modal.find("#calories-results").hide();
+        modal.modal();
     },
 });
 
@@ -160,22 +180,44 @@ var MealCreateView = Backbone.View.extend({
 var UserSettingsView = Backbone.View.extend({
 
     events: {
-        'submit form': 'updateSettings'
+        'submit form': 'checkCalories'
     },
 
-    updateSettings: function(event) {
+    checkCalories: function(event) {
 
         event.preventDefault();
 
-        var data = {}
-        this.$el.find('input').each(function() {
-            data[this.name] = this.value;
+        var max_calories = this.$('input[name=max_calories]').val();
+        var date = this.$('input[name=date]').val();
+
+        this.$("#calories-results").show();
+
+        if (this.calculateRightCalories(date, max_calories) === true) {
+            this.$(".metric-failure").hide();
+            this.$(".metric-success").show();
+        } else {
+            this.$(".metric-success").hide();
+            this.$(".metric-failure").show();
+        }
+
+        app.currentUser.set("max_calories", max_calories);
+        app.currentUser.save();
+    },
+
+    calculateRightCalories: function(date, max_calories) {
+
+        var compareDate = Utils.getDate(new Date(date));
+        var calories = 0;
+
+        app.meals.each(function(meal, i) {
+            var date = Utils.getDate(new Date(meal.get("date")));
+            if (compareDate == date) {
+                calories += parseInt(meal.get("calories"));
+            }
         });
 
-        app.currentUser.set("max_calories", data.max_calories);
-        app.currentUser.save();
-
-        $("#user-settings-modal").modal("hide");
+        this.$("#calories-total").text(calories);
+        return calories < max_calories;
     }
 });
 
@@ -220,26 +262,10 @@ var MealItemView = Backbone.View.extend({
 
         var date = new Date(this.model.get("date"));
         var time = new Date(this.model.get("date") + " " + this.model.get("time"));
-        mealModal.find('input[name=date]').val(this.getDate(date));
-        mealModal.find('input[name=time]').val(this.getTime(time));
+        mealModal.find('input[name=date]').val(Utils.getDate(date));
+        mealModal.find('input[name=time]').val(Utils.getTime(time));
 
         mealModal.modal();
-    },
-
-    formatTime: function(time) {
-        var formattedTime = (time < 10) ? "0" : "";
-        return formattedTime + time;
-    },
-
-    getDate: function(date) {
-        return date.getFullYear() + "-" + this.formatTime((date.getMonth()+1)) + "-" + this.formatTime(date.getDate());
-    },
-
-    getTime: function(date) {
-        var hours = date.getHours();
-        var mins = date.getMinutes();
-        var secs = date.getSeconds();
-        return this.formatTime(hours) + ":" + this.formatTime(mins) + ":" + this.formatTime(secs);
     },
 
     render: function() {
@@ -309,8 +335,6 @@ var MealsListView = Backbone.View.extend({
         if (filters.time_to) {
             apiFilters.time__lte = filters.time_to;
         }
-
-        console.log(apiFilters);
 
         this.reset();
         this.collection.reset();
