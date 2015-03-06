@@ -83,7 +83,8 @@ class MealResourceTest(BaseResourceTest):
         self.date_time = timezone.now()
 
         self.post_data = {
-            "date_time": self.date_time.isoformat(),
+            "date": self.date_time.isoformat(),
+            "time": self.date_time.time().isoformat(),
             "text": "This is my first meal",
             "calories": 100,
             "customer": "/api/v1/customer/%s/" % self.customer.id,
@@ -99,9 +100,11 @@ class MealResourceTest(BaseResourceTest):
         self.assertHttpCreated(resp)
 
         self.post_data["customer"] = self.customer.id
+        self.post_data.pop("time")
+
         meal = Meal.objects.get(**self.post_data)
         self.assertEqual(meal.calories, self.post_data["calories"])
-        self.assertEqual(meal.date_time, self.date_time)
+        self.assertEqual(meal.date, self.date_time)
         self.assertEqual(meal.text, self.post_data["text"])
 
     def test_get_meals(self):
