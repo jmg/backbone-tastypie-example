@@ -1,6 +1,6 @@
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 from tastypie.authorization import Authorization
-from tastypie.authentication import SessionAuthentication
+from tastypie.authentication import SessionAuthentication, BasicAuthentication, Authentication
 from tastypie import fields
 from calories.models import Customer, Meal
 from django.conf.urls import url
@@ -74,6 +74,15 @@ class CustomerResource(BaseApiResource):
             return self.response_failure(request, str(e))
 
 
+class SillyAuthentication(Authentication):
+
+    def is_authenticated(self, request, **kwargs):
+        return request.user.is_authenticated()
+
+    def get_identifier(self, request):
+        return request.user.username
+
+
 class MealResource(BaseApiResource):
 
     customer = fields.ForeignKey(CustomerResource, 'customer')
@@ -83,7 +92,7 @@ class MealResource(BaseApiResource):
         resource_name = "meal"
         authorization = Authorization()
         always_return_data = True
-        authentication = SessionAuthentication()
+        authentication = SillyAuthentication()
 
         filtering = {
             'customer': ALL_WITH_RELATIONS,
