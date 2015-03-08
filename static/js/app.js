@@ -127,7 +127,7 @@ var RegistrationView = Backbone.View.extend({
                 app.showMealsPanel();
                 app.currentUser = new Customer({id: response.id, username: email});
             } else {
-                bootbox.alert("Passwords don't match");
+                bootbox.alert(response.message);
             }
         });
     },

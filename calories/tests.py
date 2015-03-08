@@ -51,6 +51,14 @@ class CustomerResourceTest(BaseResourceTest):
 
         self.assertEqual(self.deserialize(resp)['success'], True)
 
+    def test_login_session(self):
+
+        self.register()
+        self.login()
+
+        resp = self.client.post('/api/v1/customer/is_logged_in/', {})
+        self.assertEqual(self.deserialize(resp), True)
+
     def test_login_failure(self):
 
         self.register()
@@ -131,3 +139,16 @@ class MealResourceTest(BaseResourceTest):
         resp = self.client.delete("/api/v1/meal/1/")
         self.assertEqual(Meal.objects.count(), 0)
 
+    def test_create_meal_without_login(self):
+
+        self.register()
+        self.login()
+        resp = self.client.post('/api/v1/customer/logout/', {})
+
+        self.create_meal()
+
+        self.assertEqual(Meal.objects.count(), 0)
+        resp = self.create_meal()
+
+        self.assertEqual(resp.status_code, 401)
+        self.assertEqual(Meal.objects.count(), 0)

@@ -32,13 +32,13 @@ class CustomerResource(BaseApiResource):
         resource_name = "customer"
         authorization = Authorization()
         always_return_data = True
-        #authentication = SessionAuthentication()
 
     def prepend_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/login/$" % (self._meta.resource_name, ), self.wrap_view('login'), name="api_login"),
             url(r"^(?P<resource_name>%s)/logout/$" % (self._meta.resource_name, ), self.wrap_view('logout'), name="api_logout"),
             url(r"^(?P<resource_name>%s)/register/$" % (self._meta.resource_name, ), self.wrap_view('register'), name="api_register"),
+            url(r"^(?P<resource_name>%s)/is_logged_in/$" % (self._meta.resource_name, ), self.wrap_view('is_logged_in'), name="api_is_logged_in"),
         ]
 
     def login(self, request, **kwargs):
@@ -51,6 +51,10 @@ class CustomerResource(BaseApiResource):
             return self.response_success(request, data={"id": customer.id})
         except Exception, e:
             return self.response_failure(request, str(e))
+
+    def is_logged_in(self, request, **kwargs):
+
+        return self.create_response(request, request.user.is_authenticated())
 
     def logout(self, request, **kwargs):
 
@@ -79,7 +83,7 @@ class MealResource(BaseApiResource):
         resource_name = "meal"
         authorization = Authorization()
         always_return_data = True
-        #authentication = SessionAuthentication()
+        authentication = SessionAuthentication()
 
         filtering = {
             'customer': ALL_WITH_RELATIONS,
