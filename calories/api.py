@@ -1,6 +1,6 @@
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
+from calories.auth import BasicSessionAuthentication, CustomerAuthorization
 from tastypie.authorization import Authorization
-from tastypie.authentication import SessionAuthentication, BasicAuthentication, Authentication
 from tastypie import fields
 from calories.models import Customer, Meal
 from django.conf.urls import url
@@ -74,15 +74,6 @@ class CustomerResource(BaseApiResource):
             return self.response_failure(request, str(e))
 
 
-class SillyAuthentication(Authentication):
-
-    def is_authenticated(self, request, **kwargs):
-        return request.user.is_authenticated()
-
-    def get_identifier(self, request):
-        return request.user.username
-
-
 class MealResource(BaseApiResource):
 
     customer = fields.ForeignKey(CustomerResource, 'customer')
@@ -90,9 +81,9 @@ class MealResource(BaseApiResource):
     class Meta:
         queryset = Meal.objects.all()
         resource_name = "meal"
-        authorization = Authorization()
         always_return_data = True
-        authentication = SillyAuthentication()
+        authorization = CustomerAuthorization()
+        authentication = BasicSessionAuthentication()
 
         filtering = {
             'customer': ALL_WITH_RELATIONS,
@@ -101,6 +92,7 @@ class MealResource(BaseApiResource):
         }
 
     def dehydrate(self, bundle):
+
         bundle.data['date'] = bundle.data['date'].strftime("%m-%d-%Y")
         bundle.data['time'] = bundle.data['time'].strftime("%I:%M %p")
         return bundle

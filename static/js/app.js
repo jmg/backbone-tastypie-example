@@ -30,11 +30,20 @@ var Utils = {
         return formattedTime + time;
     },
 
-    getDate: function(date) {
+    getDate: function(date, noUtc) {
+        if (noUtc !== false) {
+            date = this.toUtc(date);
+        }
         return date.getUTCFullYear() + "-" + this.formatTime((date.getUTCMonth()+1)) + "-" + this.formatTime(date.getUTCDate());
     },
 
+    toUtc: function(date) {
+        date.setTime(date.getTime() - date.getTimezoneOffset()*60*1000);
+        return date;
+    },
+
     getTime: function(date) {
+        date = this.toUtc(date);
         var hours = date.getUTCHours();
         var mins = date.getUTCMinutes();
         var secs = date.getUTCSeconds();
@@ -206,7 +215,7 @@ var UserSettingsView = Backbone.View.extend({
 
     calculateRightCalories: function(date, max_calories) {
 
-        var compareDate = Utils.getDate(new Date(date));
+        var compareDate = Utils.getDate(new Date(date), false);
         var calories = 0;
 
         app.meals.each(function(meal, i) {
@@ -217,7 +226,7 @@ var UserSettingsView = Backbone.View.extend({
         });
 
         this.$("#calories-total").text(calories);
-        return calories < max_calories;
+        return calories <= max_calories;
     }
 });
 
@@ -280,13 +289,15 @@ var MealsListView = Backbone.View.extend({
         "submit #search-form": "searchMeals"
     },
 
-    initialize: function(){
+    initialize: function() {
 
         this.listenTo(this.collection, 'reset', this.addAll, this);
         this.listenTo(this.collection, 'add', this.addOne, this);
         this.listenTo(this.collection, 'all', this.render, this);
 
-        this.collection.fetch();
+        if (!!this.currentUser) {
+            this.updateList();
+        }
     },
 
     addAll: function() {
@@ -336,11 +347,19 @@ var MealsListView = Backbone.View.extend({
             apiFilters.time__lte = filters.time_to;
         }
 
+        this.updateList(apiFilters);
+    },
+
+    updateList: function(data) {
+
         this.reset();
         this.collection.reset();
 
-        this.collection.fetch({ data: apiFilters });
-
+        if (!!data) {
+            this.collection.fetch({ data: data });
+        } else {
+            this.collection.fetch();
+        }
     }
 });
 
@@ -356,18 +375,18 @@ var MealsApp = Backbone.Router.extend({
 
         this.meals = new Meals();
 
-        this.views.loginView = new LoginView({el: $("#login")});
-        this.views.registrationView = new RegistrationView({el: $("#registration")});
-        this.views.menuView = new MenuView({el: $("#menu")});
-        this.views.mealListView = new MealsListView({el: $("#meals"), collection: this.meals});
-        this.views.mealCreateView = new MealCreateView({el: $("#create-meal")});
-        this.views.userSettingsView = new UserSettingsView({el: $("#user-settings")});
-
         if (window.currentUser) {
             this.currentUser = new Customer(window.currentUser);
         } else {
             this.currentUser = false;
         }
+
+        this.views.loginView = new LoginView({el: $("#login")});
+        this.views.registrationView = new RegistrationView({el: $("#registration")});
+        this.views.menuView = new MenuView({el: $("#menu")});
+        this.views.mealListView = new MealsListView({el: $("#meals"), collection: this.meals, currentUser: currentUser});
+        this.views.mealCreateView = new MealCreateView({el: $("#create-meal")});
+        this.views.userSettingsView = new UserSettingsView({el: $("#user-settings")});
 
         if (!this.currentUser) {
             this.showView(this.views.loginView);
@@ -378,6 +397,7 @@ var MealsApp = Backbone.Router.extend({
 
     showMealsPanel: function() {
         this.showView([this.views.mealListView, this.views.mealCreateView, this.views.menuView]);
+        this.views.mealListView.updateList();
     },
 
     showView: function(views) {

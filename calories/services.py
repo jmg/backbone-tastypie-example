@@ -24,7 +24,10 @@ class CustomerService(object):
 
         user = User(username=username)
         user.set_password(password)
-        user.save()
+        try:
+            user.save()
+        except:
+            raise Exception("Email already taken")
 
         customer = Customer(user=user)
         customer.save()
