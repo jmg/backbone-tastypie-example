@@ -1,3 +1,4 @@
 simplejson
 django==1.6
 django-tastypie
+gunicorn
