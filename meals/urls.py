@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, include, url
+from django.conf import settings
 
 from django.contrib import admin
 admin.autodiscover()
@@ -15,5 +16,7 @@ urlpatterns = patterns('',
 
     url(r'^$', "calories.views.index"),
     url(r'^admin/', include(admin.site.urls)),
-    (r'^api/', include(v1_api.urls))
+    (r'^api/', include(v1_api.urls)),
+
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
 )
